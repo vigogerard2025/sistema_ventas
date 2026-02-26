@@ -11,12 +11,12 @@ namespace SistemaVentas.Forms
     // =========================================================================
     public class FrmNuevoUsuario : Form
     {
-        private readonly Color cFondo = Color.FromArgb(22, 22, 32);
-        private readonly Color cOro   = Color.FromArgb(212, 175, 95);
-        private readonly Color cInput = Color.FromArgb(46, 46, 62);
-        private readonly Color cTexto = Color.FromArgb(225, 220, 210);
-        private readonly Color cGris  = Color.FromArgb(130, 125, 115);
-        private readonly Color cRojo  = Color.FromArgb(200, 70, 70);
+        private readonly Color cFondo = Color.FromArgb(0, 150, 220);   // azul fondo exterior
+        private readonly Color cOro = Color.FromArgb(0, 82, 204);   // azul botón "Sign Up"
+        private readonly Color cInput = Color.FromArgb(243, 246, 250);  // gris muy claro inputs
+        private readonly Color cTexto = Color.FromArgb(20, 30, 90);   // azul oscuro títulos
+        private readonly Color cGris = Color.FromArgb(160, 170, 190);  // gris azulado placeholder
+        private readonly Color cRojo = Color.FromArgb(220, 53, 69);  // rojo errores
 
         private TextBox txtNombre, txtUsuario, txtCorreo, txtPassword;
         private ComboBox cboEmpresa;
@@ -24,37 +24,47 @@ namespace SistemaVentas.Forms
 
         public FrmNuevoUsuario()
         {
-            this.Text            = "Solicitar nuevo usuario";
-            this.Size            = new Size(480, 540);
-            this.StartPosition   = FormStartPosition.CenterParent;
+            this.Text = "Solicitar nuevo usuario";
+            this.Size = new Size(480, 540);
+            this.StartPosition = FormStartPosition.CenterParent;
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
-            this.MaximizeBox     = false;
-            this.MinimizeBox     = false;
-            this.BackColor       = cFondo;
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
+            this.BackColor = Color.White;
 
             // ── Encabezado ────────────────────────────────────────────────
             var lblIcon = new Label
             {
-                Text = "👤", Font = new Font("Segoe UI Emoji", 26),
-                ForeColor = cOro, BackColor = Color.Transparent,
-                AutoSize = true, Location = new Point(210, 18)
+                Text = "👤",
+                Font = new Font("Segoe UI Emoji", 26),
+                ForeColor = cOro,
+                BackColor = Color.Transparent,
+                AutoSize = true,
+                Location = new Point(210, 18)
             };
 
             var lblTitulo = new Label
             {
                 Text = "Solicitar nuevo usuario",
                 Font = new Font("Georgia", 14, FontStyle.Bold),
-                ForeColor = cTexto, BackColor = Color.Transparent,
-                AutoSize = false, Size = new Size(420, 30),
-                Location = new Point(30, 70), TextAlign = ContentAlignment.MiddleCenter
+                ForeColor = cTexto,
+                BackColor = Color.Transparent,
+                AutoSize = false,
+                Size = new Size(420, 30),
+                Location = new Point(30, 70),
+                TextAlign = ContentAlignment.MiddleCenter
             };
 
             var lblDesc = new Label
             {
                 Text = "Complete el formulario. El administrador\nrecibirá su solicitud y activará su cuenta.",
-                Font = new Font("Arial", 9), ForeColor = cGris, BackColor = Color.Transparent,
-                AutoSize = false, Size = new Size(420, 36),
-                Location = new Point(30, 104), TextAlign = ContentAlignment.MiddleCenter
+                Font = new Font("Arial", 9),
+                ForeColor = Color.FromArgb(80, 95, 120),
+                BackColor = Color.Transparent,
+                AutoSize = false,
+                Size = new Size(420, 36),
+                Location = new Point(30, 104),
+                TextAlign = ContentAlignment.MiddleCenter
             };
 
             var sep = new Panel { Size = new Size(420, 1), Location = new Point(30, 144), BackColor = Color.FromArgb(60, 60, 75) };
@@ -62,12 +72,15 @@ namespace SistemaVentas.Forms
             // ── Campos ────────────────────────────────────────────────────
             int y = 158;
 
-            AddLabel("EMPRESA", y);        y += 18;
+            AddLabel("EMPRESA", y); y += 18;
             cboEmpresa = new ComboBox
             {
-                Location = new Point(30, y), Size = new Size(420, 32),
-                BackColor = cInput, ForeColor = cTexto,
-                FlatStyle = FlatStyle.Flat, Font = new Font("Arial", 10),
+                Location = new Point(30, y),
+                Size = new Size(420, 32),
+                BackColor = cInput,
+                ForeColor = cTexto,
+                FlatStyle = FlatStyle.Flat,
+                Font = new Font("Arial", 10),
                 DropDownStyle = ComboBoxStyle.DropDownList
             };
             CargarEmpresas();
@@ -75,13 +88,13 @@ namespace SistemaVentas.Forms
             y += 44;
 
             AddLabel("NOMBRE COMPLETO", y); y += 18;
-            txtNombre  = AddTextBox(y); y += 44;
+            txtNombre = AddTextBox(y); y += 44;
 
-            AddLabel("USUARIO DESEADO", y);  y += 18;
+            AddLabel("USUARIO DESEADO", y); y += 18;
             txtUsuario = AddTextBox(y); y += 44;
 
             AddLabel("CORREO ELECTRÓNICO", y); y += 18;
-            txtCorreo  = AddTextBox(y); y += 44;
+            txtCorreo = AddTextBox(y); y += 44;
 
             AddLabel("CONTRASEÑA", y); y += 18;
             txtPassword = AddTextBox(y, esPassword: true); y += 52;
@@ -90,10 +103,13 @@ namespace SistemaVentas.Forms
             btnEnviar = new Button
             {
                 Text = "ENVIAR SOLICITUD",
-                Size = new Size(420, 44), Location = new Point(30, y),
-                BackColor = cOro, ForeColor = Color.FromArgb(20, 16, 6),
+                Size = new Size(420, 44),
+                Location = new Point(30, y),
+                BackColor = Color.White,
+                ForeColor = Color.FromArgb(20, 16, 6),
                 FlatStyle = FlatStyle.Flat,
-                Font = new Font("Arial", 10, FontStyle.Bold), Cursor = Cursors.Hand
+                Font = new Font("Arial", 10, FontStyle.Bold),
+                Cursor = Cursors.Hand
             };
             btnEnviar.FlatAppearance.BorderSize = 0;
             btnEnviar.FlatAppearance.MouseOverBackColor = Color.FromArgb(240, 210, 130);
@@ -101,11 +117,14 @@ namespace SistemaVentas.Forms
 
             btnCancelar = new Button
             {
-                Text = "Cancelar", Size = new Size(120, 22),
+                Text = "Cancelar",
+                Size = new Size(120, 22),
                 Location = new Point(180, y + 50),
-                BackColor = Color.Transparent, ForeColor = cGris,
+                BackColor = Color.Transparent,
+                ForeColor = Color.Black,
                 FlatStyle = FlatStyle.Flat,
-                Font = new Font("Arial", 8, FontStyle.Underline), Cursor = Cursors.Hand
+                Font = new Font("Arial", 8, FontStyle.Underline),
+                Cursor = Cursors.Hand
             };
             btnCancelar.FlatAppearance.BorderSize = 0;
             btnCancelar.FlatAppearance.MouseOverBackColor = Color.Transparent;
@@ -119,10 +138,14 @@ namespace SistemaVentas.Forms
         {
             this.Controls.Add(new Label
             {
-                Text = texto, Font = new Font("Arial", 7, FontStyle.Bold),
-                ForeColor = cOro, BackColor = Color.Transparent,
-                AutoSize = false, Size = new Size(420, 15),
-                Location = new Point(30, top), TextAlign = ContentAlignment.MiddleLeft
+                Text = texto,
+                Font = new Font("Arial", 7, FontStyle.Bold),
+                ForeColor = cOro,
+                BackColor = Color.Transparent,
+                AutoSize = false,
+                Size = new Size(420, 15),
+                Location = new Point(30, top),
+                TextAlign = ContentAlignment.MiddleLeft
             });
         }
 
@@ -130,8 +153,10 @@ namespace SistemaVentas.Forms
         {
             var tb = new TextBox
             {
-                Location = new Point(30, top), Size = new Size(420, 32),
-                BackColor = cInput, ForeColor = cTexto,
+                Location = new Point(30, top),
+                Size = new Size(420, 32),
+                BackColor = cInput,
+                ForeColor = cTexto,
                 BorderStyle = BorderStyle.FixedSingle,
                 Font = new Font("Arial", 10),
                 PasswordChar = esPassword ? '●' : '\0'
@@ -156,7 +181,8 @@ namespace SistemaVentas.Forms
                 }
                 cboEmpresa.SelectedIndex = 0;
                 // Mostrar solo nombre en el combo
-                cboEmpresa.Format += (s, e) => {
+                cboEmpresa.Format += (s, e) =>
+                {
                     if (e.ListItem.ToString().Contains("|"))
                         e.Value = e.ListItem.ToString().Split('|')[1];
                 };
