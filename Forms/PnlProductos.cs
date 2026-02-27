@@ -234,8 +234,27 @@ namespace SistemaVentas.Forms
             dgv.Columns.Add(new DataGridViewTextBoxColumn { Name = "ColId",     HeaderText = "Código",        Width = 70  });
             dgv.Columns.Add(new DataGridViewTextBoxColumn { Name = "ColNombre", HeaderText = "Nombre del Producto", Width = 240 });
             dgv.Columns.Add(new DataGridViewTextBoxColumn { Name = "ColPres",   HeaderText = "Presentacion",  Width = 140 });
-            dgv.Columns.Add(new DataGridViewTextBoxColumn { Name = "ColPrecio", HeaderText = "Precio",        Width = 80, DefaultCellStyle = { Alignment = DataGridViewContentAlignment.MiddleRight } });
-            dgv.Columns.Add(new DataGridViewTextBoxColumn { Name = "ColStock",  HeaderText = "Stock",         Width = 70, DefaultCellStyle = { Alignment = DataGridViewContentAlignment.MiddleRight } });
+dgv.Columns.Add(new DataGridViewTextBoxColumn
+{
+    Name = "ColPrecio",
+    HeaderText = "Precio",
+    Width = 80,
+    DefaultCellStyle =
+    {
+        Alignment = DataGridViewContentAlignment.MiddleRight,
+        Format = "N2" // 2 decimales
+    },
+});            dgv.Columns.Add(new DataGridViewTextBoxColumn
+{
+    Name = "ColStock",
+    HeaderText = "Stock",
+    Width = 70,
+    DefaultCellStyle =
+    {
+        Alignment = DataGridViewContentAlignment.MiddleRight,
+        Format = "N0" // entero sin decimales
+    }
+});
             dgv.Columns.Add(new DataGridViewTextBoxColumn { Name = "ColMarca",  HeaderText = "Marca",         Width = 110 });
             dgv.Columns.Add(new DataGridViewTextBoxColumn { Name = "ColIdReal", HeaderText = "ID",            Width = 0, Visible = false });
 
@@ -327,62 +346,73 @@ namespace SistemaVentas.Forms
         }
 
         // ── Cargar productos en grid ───────────────────────────────────────
-        private void CargarProductos(string filtro = "")
+       private void CargarProductos(string filtro = "")
+{
+    dgv.Rows.Clear();
+
+    try
+    {
+        using (var conn = DatabaseHelper.GetConnection())
         {
-            dgv.Rows.Clear();
-            try
+            conn.Open();
+
+            string sql = @"
+                SELECT p.codigo, p.nombre,
+                       COALESCE(p.presentacion, p.nombre) as presentacion,
+                       p.precio_venta, 
+                       p.stock,
+                       COALESCE(p.marca, 'SIN MARCA') as marca,
+                       p.id
+                FROM productos p
+                WHERE p.activo = true
+                  AND (
+                       p.codigo   ILIKE @b
+                    OR p.nombre   ILIKE @b
+                    OR COALESCE(p.marca,'') ILIKE @b
+                    OR COALESCE(p.presentacion,'') ILIKE @b
+                  )
+                ORDER BY p.codigo DESC";
+
+            using (var cmd = new NpgsqlCommand(sql, conn))
             {
-                using (var conn = DatabaseHelper.GetConnection())
+                cmd.Parameters.AddWithValue("b", "%" + filtro + "%");
+
+                using (var dr = cmd.ExecuteReader())
                 {
-                    conn.Open();
-                    string sql = @"
-                        SELECT p.codigo, p.nombre,
-                               COALESCE(p.presentacion, p.nombre) as presentacion,
-                               p.precio_venta, p.stock,
-                               COALESCE(p.marca, 'SIN MARCA') as marca,
-                               p.id
-                        FROM productos p
-                        WHERE p.activo = true
-                          AND (
-                               p.codigo   ILIKE @b
-                            OR p.nombre   ILIKE @b
-                            OR COALESCE(p.marca,'') ILIKE @b
-                            OR COALESCE(p.presentacion,'') ILIKE @b
-                          )
-                        ORDER BY p.codigo DESC";
-                    using (var cmd = new NpgsqlCommand(sql, conn))
+                    int count = 0;
+
+                    while (dr.Read())
                     {
-                        cmd.Parameters.AddWithValue("b", "%" + filtro + "%");
-                        using (var dr = cmd.ExecuteReader())
-                        {
-                            int count = 0;
-                            while (dr.Read())
-                            {
-                                count++;
-                                int    rowIdx = dgv.Rows.Add(
-                                    dr.GetString(0),           // Código
-                                    dr.GetString(1),           // Nombre
-                                    dr.GetString(2),           // Presentación
-                                    dr.GetDecimal(3).ToString("F4"),  // Precio
-                                    dr.GetInt32(4).ToString("N2"),    // Stock
-                                    dr.GetString(5),           // Marca
-                                    dr.GetInt32(6)             // ID real (oculto)
-                                );
-                                // Resaltar stock bajo o negativo
-                                int stock = dr.GetInt32(4);
-                                if (stock <= 0)
-                                    dgv.Rows[rowIdx].DefaultCellStyle.ForeColor = Color.FromArgb(200, 50, 50);
-                                else if (stock <= 5)
-                                    dgv.Rows[rowIdx].DefaultCellStyle.ForeColor = Color.FromArgb(200, 120, 0);
-                            }
-                            lblContador.Text = $"{count} producto{(count != 1 ? "s" : "")}";
-                        }
+                        count++;
+
+                        int rowIdx = dgv.Rows.Add(
+                            dr.GetString(0),   // Código
+                            dr.GetString(1),   // Nombre
+                            dr.GetString(2),   // Presentación
+                            dr.GetDecimal(3),  // Precio (DECIMAL ✔)
+                            dr.GetInt32(4),    // Stock (INT ✔)
+                            dr.GetString(5),   // Marca
+                            dr.GetInt32(6)     // ID oculto
+                        );
+
+                        int stock = dr.GetInt32(4);
+
+                        if (stock <= 0)
+                            dgv.Rows[rowIdx].DefaultCellStyle.ForeColor = Color.FromArgb(200, 50, 50);
+                        else if (stock <= 5)
+                            dgv.Rows[rowIdx].DefaultCellStyle.ForeColor = Color.FromArgb(200, 120, 0);
                     }
+
+                    lblContador.Text = $"{count} producto{(count != 1 ? "s" : "")}";
                 }
             }
-            catch (Exception ex) { /* silencioso en búsqueda en tiempo real */ }
         }
-
+    }
+    catch
+    {
+        // Silencioso para búsqueda en tiempo real
+    }
+}
         // ── Click en fila ─────────────────────────────────────────────────
         private void DgvCellClick(object sender, DataGridViewCellEventArgs e)
         {

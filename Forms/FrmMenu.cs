@@ -18,7 +18,6 @@ namespace SistemaVentas.Forms
         private readonly Color colorFondo   = Color.FromArgb(245, 240, 228);
         private readonly Color colorSep     = Color.FromArgb(120, 100, 55);
 
-        // Lleva la cuenta del índice de botones en el sidebar
         private int _indiceSidebar = 0;
 
         public FrmMenu()
@@ -95,46 +94,38 @@ namespace SistemaVentas.Forms
             };
             pnlSidebar.Controls.Add(logo);
 
-            // ══════════════════════════════════════════════════════════════
-            // SECCIÓN: PRINCIPAL (todos los roles)
-            // ══════════════════════════════════════════════════════════════
-            AgregarBotonMenu("🏠  Inicio",         () => MostrarPanel(new PnlInicio()));
-
-            // ── Separador: VENTAS ─────────────────────────────────────────
+            // ── VENTAS ────────────────────────────────────────────────────
+            AgregarBotonMenu("🏠  Inicio",            () => MostrarPanel(new PnlInicio()));
             AgregarSeparador("VENTAS");
-            AgregarBotonMenu("🛒  Nueva Venta",    () => MostrarPanel(new PnlVentas()));
-            AgregarBotonMenu("📋  Historial",      () => MostrarPanel(new PnlHistorialVentas()));
-            AgregarBotonMenu("🧾  Comprobantes",   () => MostrarPanel(new PnlComprobantes()));
+            AgregarBotonMenu("🛒  Nueva Venta",       () => MostrarPanel(new PnlVentas()));
+            AgregarBotonMenu("📋  Historial Ventas",  () => MostrarPanel(new PnlHistorialVentas()));
+            AgregarBotonMenu("🧾  Comprobantes",      () => MostrarPanel(new PnlComprobantes()));
 
-            // ── Separador: INVENTARIO ─────────────────────────────────────
+            // ── COMPRAS ───────────────────────────────────────────────────
+            AgregarSeparador("COMPRAS");
+            AgregarBotonMenu("📥  Nueva Compra",      () => MostrarPanel(new PnlCompras()));
+            AgregarBotonMenu("📋  Historial Compras", () => MostrarPanel(new PnlHistorialCompras()));
+
+            // ── INVENTARIO ────────────────────────────────────────────────
             AgregarSeparador("INVENTARIO");
-            AgregarBotonMenu("📦  Productos",      () => MostrarPanel(new PnlProductos()));
+            AgregarBotonMenu("📦  Productos",         () => MostrarPanel(new PnlProductos()));
 
-            // ── Separador: PERSONAS ───────────────────────────────────────
+            // ── PERSONAS ──────────────────────────────────────────────────
             AgregarSeparador("PERSONAS");
-            AgregarBotonMenu("👥  Clientes",       () => MostrarPanel(new PnlClientes()));
-            AgregarBotonMenu("👔  Empleados",      () => MostrarPanel(new PnlEmpleados()));
+            AgregarBotonMenu("👥  Clientes",          () => MostrarPanel(new PnlClientes()));
+            AgregarBotonMenu("👔  Empleados",         () => MostrarPanel(new PnlEmpleados()));
 
-            // ── Separador: ANÁLISIS ───────────────────────────────────────
+            // ── ANÁLISIS ──────────────────────────────────────────────────
             AgregarSeparador("ANÁLISIS");
-            AgregarBotonMenu("📊  Reportes",       () => MostrarPanel(new PnlReportes()));
+            AgregarBotonMenu("📊  Reportes",          () => MostrarPanel(new PnlReportes()));
 
-            // ── Separador: SISTEMA ────────────────────────────────────────
+            // ── SISTEMA ───────────────────────────────────────────────────
             AgregarSeparador("SISTEMA");
-            AgregarBotonMenu("⚙️  Configuración",  () => MostrarPanel(new PnlConfiguracion()));
+            AgregarBotonMenu("⚙️  Configuración",     () => MostrarPanel(new PnlConfiguracion()));
 
-            // ══════════════════════════════════════════════════════════════
-            // SECCIÓN EXCLUSIVA: ADMINISTRADOR
-            // ══════════════════════════════════════════════════════════════
-            if (Sesion.UsuarioActivo?.RolNombre == "ADMINISTRADOR")
-            {
-                AgregarSeparador("ADMIN");
-                AgregarBotonMenu("📨  Solicitudes",    () => MostrarPanel(new PnlSolicitudesUsuarios()));
-            }
-
-            // ── Cerrar sesión siempre al final ────────────────────────────
+            // ── Cerrar sesión ─────────────────────────────────────────────
             AgregarSeparadorLinea();
-            AgregarBotonMenu("🚪  Cerrar Sesión",  CerrarSesion);
+            AgregarBotonMenu("🚪  Cerrar Sesión", CerrarSesion);
 
             // ── CONTENT ───────────────────────────────────────────────────
             pnlContent = new Panel
@@ -156,7 +147,6 @@ namespace SistemaVentas.Forms
             MostrarPanel(new PnlInicio());
         }
 
-        // ── Botón de menú ─────────────────────────────────────────────────
         private void AgregarBotonMenu(string texto, Action accion)
         {
             var btn = new Button
@@ -180,7 +170,6 @@ namespace SistemaVentas.Forms
             _indiceSidebar++;
         }
 
-        // ── Separador con etiqueta de sección ─────────────────────────────
         private void AgregarSeparador(string titulo)
         {
             var lbl = new Label
@@ -199,7 +188,6 @@ namespace SistemaVentas.Forms
             _indiceSidebar++;
         }
 
-        // ── Línea separadora simple ───────────────────────────────────────
         private void AgregarSeparadorLinea()
         {
             var pnl = new Panel
